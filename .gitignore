@@ -1,0 +1,4 @@
+.vscode
+debug_custom.json
+debug.cfg
+esp32s2.svd
