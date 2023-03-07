@@ -15,7 +15,7 @@
 #define SCK     12
 #define MISO    13
 #define MOSI    11
-#define CS      15
+#define CS      10
 
 //PinOut I2S
 #define I2S1 42
@@ -65,12 +65,22 @@ void loop()
 // SD CARD
 
 void initSD() {
+    pinMode(14,OUTPUT);
+    digitalWrite(14,HIGH);
     SPI.begin(SCK,MISO,MOSI,CS);
-    if (!SD.begin(CS)) {
-        Serial.println("Failed to mount card");
+     if (!SD.begin(CS)) {
+        Serial.println("Card Mount Failed");
         return;
-    } else {
-        Serial.println("sd mounted!!!");
+    }
+    uint8_t cardType = SD.cardType();
+    if (cardType == CARD_NONE) {
+        Serial.println("No SD card attached");
+        return;
+    }
+    Serial.println("Initializing SD card...");
+    if (!SD.begin(CS)) {
+        Serial.println("ERROR - SD card initialization failed!");
+        return;    // init failed
     }
 }
 
