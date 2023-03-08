@@ -10,10 +10,17 @@
 #include "SPI.h"
 
 #define BOUD    115200 
+
+// PinOut SD CARD
 #define SCK     12
 #define MISO    13
 #define MOSI    11
-#define CS      15
+#define CS      10
+
+//PinOut I2S
+#define I2S1 42
+#define I2S2 41
+#define I2S3 45
 
 AudioGeneratorWAV *wav[3];
 AudioFileSourceSD *source[3];
@@ -35,31 +42,11 @@ void setup()
     delay(1000);
 
     Serial.printf("WAV start\n");
-
-    // audioLogger = &Serial;
-    source[0] = new AudioFileSourceSD(soundPaths[0].c_str());
-    source[1] = new AudioFileSourceSD(soundPaths[1].c_str());
-    // source[2] = new AudioFileSourceSD(soundPaths[2].c_str());
-
-    out = new AudioOutputI2SNoDAC();
-    // out -> SetGain(4);
-    out -> SetBitsPerSample(16);
-    out -> SetRate(32000);
-    out -> SetPinout(42, 41, 45);
-    mixer = new AudioOutputMixer(32, out);
-
-    stub[0] = mixer->NewInput();
-    stub[0]->SetGain(0.6);
-    stub[1] = mixer->NewInput();
-    stub[1]->SetGain(0.2);
-    // stub[2] = mixer->NewInput();
-    // stub[2]->SetGain(0.1);
-    wav[0] = new AudioGeneratorWAV();
-    wav[0]->begin(source[0], stub[0]);
-    wav[1] = new AudioGeneratorWAV();
-    wav[1]->begin(source[1], stub[1]);
-    // wav[2] = new AudioGeneratorWAV();
-    // wav[2]->begin(source[2], stub[2]);
+    readAudio();
+    initI2S();
+    mixAudio();
+  
+    
 }
 
 void loop()
@@ -75,15 +62,25 @@ void loop()
     // }
 }
 
-
+// SD CARD
 
 void initSD() {
+    pinMode(14,OUTPUT);
+    digitalWrite(14,HIGH);
     SPI.begin(SCK,MISO,MOSI,CS);
-    if (!SD.begin(CS)) {
-        Serial.println("Failed to mount card");
+     if (!SD.begin(CS)) {
+        Serial.println("Card Mount Failed");
         return;
-    } else {
-        Serial.println("sd mounted!!!");
+    }
+    uint8_t cardType = SD.cardType();
+    if (cardType == CARD_NONE) {
+        Serial.println("No SD card attached");
+        return;
+    }
+    Serial.println("Initializing SD card...");
+    if (!SD.begin(CS)) {
+        Serial.println("ERROR - SD card initialization failed!");
+        return;    // init failed
     }
 }
 
@@ -97,4 +94,37 @@ void readTestFile() {
         Serial.println(file.readString());
     }
     file.close();
+}
+
+// I2S/Audio
+
+void readAudio(){
+    // audioLogger = &Serial;
+    source[0] = new AudioFileSourceSD(soundPaths[0].c_str());
+    source[1] = new AudioFileSourceSD(soundPaths[1].c_str());
+    // source[2] = new AudioFileSourceSD(soundPaths[2].c_str());
+}
+
+void initI2S(){
+    out = new AudioOutputI2SNoDAC();
+    // out -> SetGain(4);
+    out -> SetBitsPerSample(16);
+    out -> SetRate(32000);
+    out -> SetPinout(I2S1, I2S2, I2S3);
+}
+
+void mixAudio(){
+    mixer = new AudioOutputMixer(32, out);
+    stub[0] = mixer->NewInput();
+    stub[0]->SetGain(0.6);
+    stub[1] = mixer->NewInput();
+    stub[1]->SetGain(0.2);
+    // stub[2] = mixer->NewInput();
+    // stub[2]->SetGain(0.1);
+    wav[0] = new AudioGeneratorWAV();
+    wav[0]->begin(source[0], stub[0]);
+    wav[1] = new AudioGeneratorWAV();
+    wav[1]->begin(source[1], stub[1]);
+    // wav[2] = new AudioGeneratorWAV();
+    // wav[2]->begin(source[2], stub[2]);
 }
