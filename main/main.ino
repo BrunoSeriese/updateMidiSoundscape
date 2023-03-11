@@ -18,13 +18,13 @@
 #define CS      10
 
 //PinOut I2S
-#define I2S1 42
-#define I2S2 41
-#define I2S3 45
+#define BLCK_PIN 42
+#define LRC_PIN 41
+#define DIN_PIN 45
 
 AudioGeneratorWAV *wav[3];
 AudioFileSourceSD *source[3];
-AudioOutputI2SNoDAC *out;
+AudioOutputI2S *out;
 AudioOutputMixer *mixer;
 AudioOutputMixerStub *stub[3];
 
@@ -57,9 +57,9 @@ void loop()
     if (wav[1]->isRunning()) {
         if (!wav[1]->loop()) { wav[1]->stop(); stub[1]->stop(); Serial.printf("stopping 2\n"); }
     }
-    // if (wav[2]->isRunning()) {
-    //     if (!wav[2]->loop()) { wav[2]->stop(); stub[2]->stop(); Serial.printf("stopping 3\n"); }
-    // }
+    if (wav[2]->isRunning()) {
+        if (!wav[2]->loop()) { wav[2]->stop(); stub[2]->stop(); Serial.printf("stopping 3\n"); }
+    }
 }
 
 // SD CARD
@@ -102,15 +102,15 @@ void readAudio(){
     // audioLogger = &Serial;
     source[0] = new AudioFileSourceSD(soundPaths[0].c_str());
     source[1] = new AudioFileSourceSD(soundPaths[1].c_str());
-    // source[2] = new AudioFileSourceSD(soundPaths[2].c_str());
+    source[2] = new AudioFileSourceSD(soundPaths[2].c_str());
 }
 
 void initI2S(){
-    out = new AudioOutputI2SNoDAC();
+    out = new AudioOutputI2S();
     // out -> SetGain(4);
     out -> SetBitsPerSample(16);
     out -> SetRate(32000);
-    out -> SetPinout(I2S1, I2S2, I2S3);
+    out -> SetPinout(BLCK_PIN, LRC_PIN, DIN_PIN);
 }
 
 void mixAudio(){
@@ -119,12 +119,12 @@ void mixAudio(){
     stub[0]->SetGain(0.6);
     stub[1] = mixer->NewInput();
     stub[1]->SetGain(0.2);
-    // stub[2] = mixer->NewInput();
-    // stub[2]->SetGain(0.1);
+    stub[2] = mixer->NewInput();
+    stub[2]->SetGain(0.1);
     wav[0] = new AudioGeneratorWAV();
     wav[0]->begin(source[0], stub[0]);
     wav[1] = new AudioGeneratorWAV();
     wav[1]->begin(source[1], stub[1]);
-    // wav[2] = new AudioGeneratorWAV();
-    // wav[2]->begin(source[2], stub[2]);
+    wav[2] = new AudioGeneratorWAV();
+    wav[2]->begin(source[2], stub[2]);
 }
