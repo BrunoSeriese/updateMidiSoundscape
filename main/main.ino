@@ -6,7 +6,7 @@ sc::SoundScaper scaper = sc::SoundScaper();
 const String soundPaths[3] = {
     "/677070__xkeril__hell-drone-with-vibrator.wav",
     "/677071__xkeril__airy-sad-drone-memories.wav",
-    "/676957__bernhoftbret__drone-41.wav"
+    "/677138__trevornet__dropwave.wav"
 };
 
 void setup() {
@@ -15,6 +15,9 @@ void setup() {
     scaper.start();
     scaper.addSound(soundPaths[0]);
     scaper.addSound(soundPaths[1]);
+    scaper.addSound(soundPaths[2]);
+    scaper.changeSoundVolume(1, 0.8);
+    scaper.changeSoundVolume(2, 2);
 }
 
 void loop() {

@@ -8,7 +8,7 @@
 #include <driver/i2s.h>
 
 #define debug true
-#define maxSounds 2
+#define maxSounds 3
 const int bufferLen = 512;
 
 const i2s_port_t I2S_PORT = I2S_NUM_0;
@@ -83,36 +83,40 @@ class Sound {
         String name;
         File source;
         int16_t buffer[bufferLen];
+        float volume = 1;
         
-        Sound() {}
+        Sound() {initBuffer();}
         Sound(String filepath) {
             name = filepath;
             source = SD.open(name);
             if (!source && debug) {
                 Serial.println("File not found: "+name);
             }
+            initBuffer();
         }
 
         void update() {
-            int numBytes = _min(sizeof(buffer), source.size() - source.position() - 1);
-            source.readBytes((char*)buffer, bufferSize);
-            
-            // when near the end of the file
-            if (source.position() > source.size()-1) {
-                int bytesLeft = bufferSize-numBytes;
-                int16_t tempBuffer[bytesLeft];
-                source.seek(0);
-                source.readBytes((char*)tempBuffer, bytesLeft);
-                for (int i = numBytes; i < bufferSize; i++)
-                {
-                    buffer[i] = tempBuffer[i];
-                }
-            }
+            if (!source) {Serial.println("No source"); return;}
+
+            if (source.position() < source.size()-1) {
+                int numBytes = _min(sizeof(buffer), source.size() - source.position() - 1);
+                source.readBytes((char*)buffer, numBytes);
+            } else {
+                Serial.println("restarting source: "+name);
+                source.close();
+                source = SD.open(name);
+            } 
         }
 
 
     private:
         const int bufferSize = sizeof(buffer);
+        void initBuffer() {
+            for (int i = 0; i < bufferLen; i++)
+            {
+                buffer[i] = 0;
+            }
+        }
 };
 
 
@@ -132,7 +136,9 @@ class SoundScaper {
             createIndex++;
         }
 
-        void changeSoundVolume(int soundIndex, int volume) {}
+        void changeSoundVolume(int index, int volume) {
+            sounds[index]->volume = volume;
+        }
 
         void start() {
             Serial.println("Setting up sd");
@@ -152,23 +158,25 @@ class SoundScaper {
             {
                 buffer[i] = 0;
             }
-            Serial.println("Cleard buffer");
             
             // update sounds
             for (int i = 0; i < maxSounds; i++)
             {
                 sounds[i]->update();
             }
-            Serial.println("Updated sounds");
 
             // get samples from sounds buffers
             for (int i = 0; i < bufferLen; i++) {
                 for (int j = 0; j < maxSounds; j++)
                 {
-                    buffer[i] += sounds[j]->buffer[i]/maxSounds;
+                    sample = sounds[j]->buffer[i];      // read sample
+                    sample = sample/maxSounds;          // normalise sample
+                    sample = round(sample*sounds[j]->volume);  // scale sample
+                    if (sample < minValue) sample = minValue; // clam sample
+                    if (sample > maxValue) sample = maxValue;
+                    buffer[i] += sample;
                 }
             }
-            Serial.println("Combined buffers");
 
             // write to i2s buffer
             size_t i2s_bytes_write = 0; 
@@ -184,6 +192,7 @@ class SoundScaper {
         int createIndex = 0;
         int16_t buffer[bufferLen];
         const int bufferSize = sizeof(buffer);
+        int16_t sample = 0;
 };
 
     
