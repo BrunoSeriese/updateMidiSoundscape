@@ -86,7 +86,9 @@ class Sound {
         int16_t buffer[bufferLen];
         float volume = 1;
         
-        Sound() {initBuffer();}
+        Sound() {
+            initBuffer();
+        }
         Sound(String filepath) {
             name = filepath;
             source = SD.open(name);
@@ -97,7 +99,7 @@ class Sound {
         }
 
         void update() {
-            if (!source) {Serial.println("No source"); return;}
+            if (!source) return;
 
             if (source.position() < source.size()-1) {
                 int numBytes = _min(sizeof(buffer), source.size() - source.position() - 1);
@@ -123,7 +125,12 @@ class Sound {
 
 class SoundScaper {
     public:
-        SoundScaper() {}
+        SoundScaper() {
+            for (int i = 0; i < maxSounds; i++)
+            {
+                sounds[i] = new Sound();
+            } 
+        }
         ~SoundScaper() {
             for (int i = 0; i < currentSounds; i++)
             {
@@ -141,6 +148,7 @@ class SoundScaper {
         void clearSounds(){
          for (int i = 0; i < maxSounds; i++) {
 
+            free(sounds[i]);
             sounds[i] = NULL;
             currentSounds = 0;
             }

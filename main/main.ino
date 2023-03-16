@@ -15,7 +15,7 @@ void setup() {
     scaper.start();
     scaper.addSound(soundPaths[0]);
     scaper.addSound(soundPaths[1]);
-    scaper.addSound(soundPaths[2]);
+    // scaper.addSound(soundPaths[2]);
     // scaper.clearSounds();
     scaper.changeSoundVolume(1, 0.8);
     scaper.changeSoundVolume(2, 2);
