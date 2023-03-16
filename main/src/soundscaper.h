@@ -198,7 +198,7 @@ class SoundScaper {
         }
 
     private:
-        Sound* sounds[1];
+        Sound* sounds[maxSounds];
         int createIndex = 0;
         int16_t buffer[bufferLen];
         const int bufferSize = sizeof(buffer);
