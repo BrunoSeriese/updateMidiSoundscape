@@ -9,6 +9,7 @@
 
 #define debug true
 #define maxSounds 3
+int currentSounds = 0;
 const int bufferLen = 512;
 
 const i2s_port_t I2S_PORT = I2S_NUM_0;
@@ -124,7 +125,7 @@ class SoundScaper {
     public:
         SoundScaper() {}
         ~SoundScaper() {
-            for (int i = 0; i < maxSounds; i++)
+            for (int i = 0; i < currentSounds; i++)
             {
                 free(sounds[i]);
             }
@@ -134,6 +135,15 @@ class SoundScaper {
             free(sounds[createIndex]);
             sounds[createIndex] = new Sound(filepath);
             createIndex++;
+            currentSounds++;
+        }
+
+        void clearSounds(){
+         for (int i = 0; i < maxSounds; i++) {
+
+            sounds[i] = NULL;
+            currentSounds = 0;
+            }
         }
 
         void changeSoundVolume(int index, int volume) {
@@ -160,17 +170,17 @@ class SoundScaper {
             }
             
             // update sounds
-            for (int i = 0; i < maxSounds; i++)
+            for (int i = 0; i < currentSounds; i++)
             {
                 sounds[i]->update();
             }
 
             // get samples from sounds buffers
             for (int i = 0; i < bufferLen; i++) {
-                for (int j = 0; j < maxSounds; j++)
+                for (int j = 0; j < currentSounds; j++)
                 {
                     sample = sounds[j]->buffer[i];      // read sample
-                    sample = sample/maxSounds;          // normalise sample
+                    sample = sample/currentSounds;          // normalise sample
                     sample = round(sample*sounds[j]->volume);  // scale sample
                     if (sample < minValue) sample = minValue; // clam sample
                     if (sample > maxValue) sample = maxValue;
@@ -188,7 +198,7 @@ class SoundScaper {
         }
 
     private:
-        Sound* sounds[maxSounds];
+        Sound* sounds[1];
         int createIndex = 0;
         int16_t buffer[bufferLen];
         const int bufferSize = sizeof(buffer);
