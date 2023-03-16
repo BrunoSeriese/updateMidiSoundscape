@@ -2,7 +2,7 @@
 
 #include "AudioFileSourceSD.h"
 #include "AudioGeneratorWAV.h"
-#include "AudioOutputI2SNoDAC.h"
+#include "AudioOutputI2S.h"
 #include "AudioOutputMixer.h"
 
 #include "FS.h"
@@ -24,7 +24,7 @@
 
 AudioGeneratorWAV *wav[3];
 AudioFileSourceSD *source[3];
-AudioOutputI2SNoDAC *out;
+AudioOutputI2S *out;
 AudioOutputMixer *mixer;
 AudioOutputMixerStub *stub[3];
 
@@ -106,7 +106,7 @@ void readAudio(){
 }
 
 void initI2S(){
-    out = new AudioOutputI2SNoDAC();
+    out = new AudioOutputI2S();
     // out -> SetGain(4);
     out -> SetBitsPerSample(16);
     out -> SetRate(32000);
