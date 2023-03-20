@@ -139,10 +139,21 @@ class SoundScaper {
         }
 
         void addSound(String filepath) {
-            free(sounds[createIndex]);
-            sounds[createIndex] = new Sound(filepath);
-            createIndex++;
-            currentSounds++;
+            if (createIndex == maxSounds){
+                createIndex = 0;
+                free(sounds[createIndex]);
+                sounds[createIndex] = new Sound(filepath);
+                createIndex++;
+            } else {
+                free(sounds[createIndex]);
+                sounds[createIndex] = new Sound(filepath);
+                createIndex++;
+                if (currentSounds < maxSounds){
+                    currentSounds++;
+                }
+                
+            }
+           
         }
 
         void clearSounds(){
