@@ -20,7 +20,7 @@ void setup() {
    
     // scaper.clearSounds();
     scaper.changeSoundVolume(1, 0.8);
-    scaper.changeSoundVolume(2, 2);
+    scaper.changeSoundVolume(2, 0.8);
 }
 
 void loop() {
