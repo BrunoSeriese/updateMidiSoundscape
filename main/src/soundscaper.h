@@ -160,7 +160,7 @@ class SoundScaper {
          for (int i = 0; i < maxSounds; i++) {
 
             free(sounds[i]);
-            sounds[i] = NULL;
+            sounds[i] = new Sound("silence.wav");
             currentSounds = 0;
             }
         }
