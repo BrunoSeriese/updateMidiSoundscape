@@ -139,23 +139,38 @@ class SoundScaper {
         }
 
         void addSound(String filepath) {
-            free(sounds[createIndex]);
-            sounds[createIndex] = new Sound(filepath);
-            createIndex++;
-            currentSounds++;
+            if (createIndex == maxSounds){
+                createIndex = 0;
+                free(sounds[createIndex]);
+                sounds[createIndex] = new Sound(filepath);
+                createIndex++;
+            } else {
+                free(sounds[createIndex]);
+                sounds[createIndex] = new Sound(filepath);
+                createIndex++;
+                if (currentSounds < maxSounds){
+                    currentSounds++;
+                }
+                
+            }
+           
         }
 
         void clearSounds(){
          for (int i = 0; i < maxSounds; i++) {
 
             free(sounds[i]);
-            sounds[i] = NULL;
+            sounds[i] = new Sound();
             currentSounds = 0;
             }
         }
 
         void changeSoundVolume(int index, int volume) {
+
+        if (sounds[index]){
             sounds[index]->volume = volume;
+        }
+            
         }
 
         void start() {
