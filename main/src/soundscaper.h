@@ -165,7 +165,7 @@ class SoundScaper {
             }
         }
 
-        void changeSoundVolume(int index, int volume) {
+        void changeSoundVolume(int index, float volume) {
 
         if (sounds[index]){
             sounds[index]->volume = volume;
