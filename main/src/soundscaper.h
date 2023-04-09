@@ -25,6 +25,8 @@ const int16_t minValue = -32000;
 #define MOSI    11
 #define CS      10
 
+int mod = 0;
+
 
 void initSD() {
     pinMode(14,OUTPUT);
@@ -105,9 +107,14 @@ class Sound {
                 int numBytes = _min(sizeof(buffer), source.size() - source.position() - 1);
                 source.readBytes((char*)buffer, numBytes);
             } else {
+            
+                this->volume = 0;
+                mod = 0;
                 Serial.println("restarting source: "+name);
                 source.close();
                 source = SD.open(name);
+                
+                
             } 
         }
 
@@ -187,6 +194,7 @@ class SoundScaper {
 
         void update() {
             // clear buffer
+            
             for (int i = 0; i < bufferLen; i++)
             {
                 buffer[i] = 0;
@@ -202,18 +210,34 @@ class SoundScaper {
             for (int i = 0; i < bufferLen; i++) {
                 for (int j = 0; j < currentSounds; j++)
                 {
+                    
                     sample = sounds[j]->buffer[i];      // read sample
                     sample = sample/currentSounds;          // normalise sample
                     sample = round(sample*sounds[j]->volume);  // scale sample
                     if (sample < minValue) sample = minValue; // clam sample
                     if (sample > maxValue) sample = maxValue;
                     buffer[i] += sample;
+                    
                 }
+                mod += 1;
+                if (mod % 1000 == 0){
+                    changeSoundVolume(0,1);
+                    changeSoundVolume(1,1);
+                    changeSoundVolume(2,1);
+                }
+
+               
+
+
             }
 
             // write to i2s buffer
             size_t i2s_bytes_write = 0; 
             i2s_write(I2S_PORT, buffer, bufferSize, &i2s_bytes_write, 10);
+
+            
+            
+        
         }
 
         void end() {
