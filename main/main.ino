@@ -19,12 +19,13 @@ void setup() {
     scaper.start();
    
     scaper.addSound(soundPaths[1]);
-    // scaper.addSound(soundPaths[0]);
+    scaper.addSound(soundPaths[2]);
     // scaper.addSound(soundPaths[0]);
    
     // scaper.clearSounds();
     // scaper.changeSoundVolume(0, 0.6);
     scaper.changeSoundVolume(0, 0);
+    scaper.changeSoundVolume(1, 0.6);
     // scaper.changeSoundVolume(2, 1);
 }
 
@@ -39,7 +40,6 @@ void loop() {
     newVolume = mapd(lastInput, 0, 8200, 0.0, 2.0);
 
     scaper.changeSoundVolume(0, newVolume);
-    Serial.println(newVolume);
     
 }
 

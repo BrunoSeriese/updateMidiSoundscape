@@ -95,19 +95,15 @@ class Sound {
             if (!source && debug) {
                 Serial.println("File not found: "+name);
             }
-            initBuffer();
+            initSource();
         }
 
         void update() {
             if (!source) return;
-
             if (source.position() < source.size()-1) {
-                int numBytes = _min(sizeof(buffer), source.size() - source.position() - 1);
-                source.readBytes((char*)buffer, numBytes);
+                readIntoBuffer();
             } else {
-                Serial.println("restarting source: "+name);
-                source.close();
-                source = SD.open(name);
+                restartSource();
             } 
         }
 
@@ -119,6 +115,28 @@ class Sound {
             {
                 buffer[i] = 0;
             }
+        }
+
+        void readIntoBuffer() {
+            int numBytes = _min(sizeof(buffer), source.size() - source.position() - 1);
+            source.readBytes((char*)buffer, numBytes);
+        }
+
+        void restartSource() {
+            Serial.println("restarting source: "+name);
+            source.close();
+            source = SD.open(name);
+            initSource();
+        }
+
+        void initSource() {
+            initBuffer();
+            skipHeader();
+        }
+
+        void skipHeader() {
+            int16_t tempBuffer[40];
+            source.readBytes((char*)tempBuffer,sizeof(tempBuffer));
         }
 };
 
