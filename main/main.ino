@@ -9,11 +9,13 @@ const String soundPaths[3] = {
     "/677138__trevornet__dropwave.wav"
 };
 
-// #define SLIDERPIN 1
-
-
-const int sliderPins = 7;
-int slider [sliderPins] = {};
+//Max sliderpins  
+const int sliderPins = 8;
+int slider[sliderPins];
+//used sliderpins
+int slider [sliderPins] = {1,2,3,4,5,6,7,8,};
+//Analog Read sliders
+int sliderVal[sliderPins];
 
 
 void setup() {
@@ -27,13 +29,7 @@ void setup() {
    
     scaper.addSound(soundPaths[1]);
     scaper.addSound(soundPaths[2]);
-    // scaper.addSound(soundPaths[0]);
-   
-    // scaper.clearSounds();
-    // scaper.changeSoundVolume(0, 0.6);
-    scaper.changeSoundVolume(0, 0);
-    scaper.changeSoundVolume(1, 0.6);
-    // scaper.changeSoundVolume(2, 1);
+
 }
 
 
@@ -51,16 +47,20 @@ void loop() {
 
 
 void initSlider(int sliders){
+
+
+    
+
     for (int i = 0; i< sliders; i++){
-        pinMode(i+1, INPUT);
-        slider[i] = i+1;
+        pinMode(slider[i], INPUT);
     }
 }
 
 void checkSliders(){
     for (int i = 0; i <sliderPins; i++){
-        lastInput = (lastInput*1.9 + analogRead(slider[i])*0.1)/2;
-        newVolume = mapd(lastInput, 0, 8200, 0.0, 2.0);
+        sliderVal[i] = (lastInput*1.9 + analogRead(slider[i])*0.1)/2;
+        newVolume = mapd(sliderVal[i], 0, 8200, 0.0, 2.0);
+        scaper.changeSoundVolume(i, newVolume);
     }
 }
 
