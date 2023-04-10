@@ -37,12 +37,7 @@ int lastInput = 0;
 double newVolume = 0;
 void loop() {
     scaper.update();
-    
-    checkSliders();
-    
-
-    scaper.changeSoundVolume(0, newVolume);
-    
+    checkSliders();  
 }
 
 
