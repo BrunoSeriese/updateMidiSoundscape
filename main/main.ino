@@ -9,12 +9,19 @@ const String soundPaths[3] = {
     "/677138__trevornet__dropwave.wav"
 };
 
-#define SLIDERPIN 1
+// #define SLIDERPIN 1
+
+
+const int sliderPins = 7;
+int slider [sliderPins] = {};
+
 
 void setup() {
     Serial.begin(115200);
 
-    pinMode(SLIDERPIN, INPUT);
+    // pinMode(SLIDERPIN, INPUT);
+
+    initSlider(sliderPins);
 
     scaper.start();
    
@@ -35,16 +42,27 @@ double newVolume = 0;
 void loop() {
     scaper.update();
     
-
-    lastInput = (lastInput*1.9 + analogRead(SLIDERPIN)*0.1)/2;
-    newVolume = mapd(lastInput, 0, 8200, 0.0, 2.0);
+    checkSliders();
+    
 
     scaper.changeSoundVolume(0, newVolume);
     
 }
 
 
+void initSlider(int sliders){
+    for (int i = 0; i< sliders; i++){
+        pinMode(i+1, INPUT);
+        slider[i] = i+1;
+    }
+}
 
+void checkSliders(){
+    for (int i = 0; i <sliderPins; i++){
+        lastInput = (lastInput*1.9 + analogRead(slider[i])*0.1)/2;
+        newVolume = mapd(lastInput, 0, 8200, 0.0, 2.0);
+    }
+}
 
 
 double mapd(double x, double in_min, double in_max, double out_min, double out_max)
