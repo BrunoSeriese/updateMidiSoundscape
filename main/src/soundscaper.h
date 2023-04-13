@@ -8,7 +8,7 @@
 #include <driver/i2s.h>
 
 #define debug true
-#define maxSounds 3
+#define maxSounds 7
 int currentSounds = 0;
 const int bufferLen = 512;
 
