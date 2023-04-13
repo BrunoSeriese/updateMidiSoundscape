@@ -30,7 +30,7 @@ void initSD() {
     pinMode(14,OUTPUT);
     digitalWrite(14,HIGH);
     SPI.begin(SCK,MISO,MOSI,CS);
-    if (!SD.begin(CS)) {
+    if (!SD.begin(CS, SPI, 4000000U, "/sd", 8, false)) {
         Serial.println("Card Mount Failed");
         return;
     }
