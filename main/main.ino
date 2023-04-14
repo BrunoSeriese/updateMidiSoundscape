@@ -36,7 +36,7 @@ void initSlider(int sliders){
     for (int i = 0; i< sliders; i++){
         pinMode(slider[i], INPUT);
         scaper.addSound(soundPaths[i]);
-        scaper.changeSoundVolume(i, 1);
+        scaper.changeSoundVolume(i, 0);
     }
 }
 
