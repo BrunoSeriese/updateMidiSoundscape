@@ -7,7 +7,7 @@ const String soundPaths[7] = {
     "/s1.wav",
     "/s2.wav",
     "/s3.wav",
-    "/s4.wav",
+    "/s2.wav",
     "/s5.wav",
     "/s6.wav",
     "/s7.wav"
@@ -15,10 +15,10 @@ const String soundPaths[7] = {
 
 const int sliderPins = 7;                   //Max sliderpins
 int slider [sliderPins] = {1,2,3,4,5,6,7};  //used sliderpins
-int sliderVal[sliderPins];                  //Analog Read sliders
+int sliderVal[sliderPins] = {0,0,0,0,0,0,0};                  //Analog Read sliders
 
 
-void setup() {
+void setup() { 
     Serial.begin(115200);
     initSlider(sliderPins);
 }
@@ -36,15 +36,18 @@ void initSlider(int sliders){
     for (int i = 0; i< sliders; i++){
         pinMode(slider[i], INPUT);
         scaper.addSound(soundPaths[i]);
+        scaper.changeSoundVolume(i, 1);
     }
 }
 
+int sliderIndex=0;
 void checkSliders(){
-    for (int i = 0; i <sliderPins; i++){
-        sliderVal[i] = (sliderVal[i]*1.9 + analogRead(slider[i])*0.1)/2;
-        double newVolume = mapd(sliderVal[i], 0, 8200, 0.0, 2.0);
-        scaper.changeSoundVolume(i, newVolume);
-    }
+    sliderVal[sliderIndex] = (sliderVal[sliderIndex]*1.9 + analogRead(slider[sliderIndex])*0.1)/2;
+    double newVolume = mapd(sliderVal[sliderIndex], 0, 8200, 0.0, 2.0);
+    scaper.changeSoundVolume(sliderIndex, newVolume);
+    
+    sliderIndex ++;
+    if (sliderIndex > sliderPins-1) sliderIndex = 0;
 }
 
 

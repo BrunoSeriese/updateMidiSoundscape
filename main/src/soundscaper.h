@@ -30,7 +30,7 @@ void initSD() {
     pinMode(14,OUTPUT);
     digitalWrite(14,HIGH);
     SPI.begin(SCK,MISO,MOSI,CS);
-    if (!SD.begin(CS, SPI, 4000000U, "/sd", 8, false)) {
+    if (!SD.begin(CS, SPI, 4000000U, "/sd", 4, false)) {
         Serial.println("Card Mount Failed");
         return;
     }
@@ -96,6 +96,9 @@ class Sound {
                 Serial.println("File not found: "+name);
             }
             initSource();
+        }
+        ~Sound() {
+            source.close();
         }
 
         void update() {
@@ -223,8 +226,14 @@ class SoundScaper {
                     sample = sounds[j]->buffer[i];      // read sample
                     sample = sample/currentSounds;          // normalise sample
                     sample = round(sample*sounds[j]->volume);  // scale sample
-                    if (sample < minValue) sample = minValue; // clam sample
-                    if (sample > maxValue) sample = maxValue;
+                    if (sample < minValue) {
+                        Serial.println("clipping1");
+                        sample = minValue;
+                    } // clam sample
+                    if (sample > maxValue) {
+                        Serial.println("clipping2");
+                        sample = maxValue;
+                    }
                     buffer[i] += sample;
                 }
             }
