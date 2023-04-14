@@ -85,7 +85,7 @@ class Sound {
         String name;
         File source;
         int16_t buffer[bufferLen];
-        float volume = 1;
+        int volume = 32;
         
         Sound() {
             initBuffer();
@@ -187,7 +187,7 @@ class SoundScaper {
             }
         }
 
-        void changeSoundVolume(int index, float volume) {
+        void changeSoundVolume(int index, int volume) {
 
         if (sounds[index]){
             sounds[index]->volume = volume;
@@ -227,7 +227,8 @@ class SoundScaper {
                     sample += sounds[j]->buffer[i]*sounds[j]->volume;      // read sample
                 }
                 
-                sample /=currentSounds*2.0;
+                sample /=256;
+
                 if (sample < minValue) {
                     Serial.println("clipping1");
                     sample = minValue;}

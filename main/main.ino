@@ -36,14 +36,14 @@ void initSlider(int sliders){
     for (int i = 0; i< sliders; i++){
         pinMode(slider[i], INPUT);
         scaper.addSound(soundPaths[i]);
-        scaper.changeSoundVolume(i, 0);
+        scaper.changeSoundVolume(i, 32);
     }
 }
 
 int sliderIndex=0;
 void checkSliders(){
     sliderVal[sliderIndex] = (sliderVal[sliderIndex]*1.9 + analogRead(slider[sliderIndex])*0.1)/2;
-    double newVolume = mapd(sliderVal[sliderIndex], 0, 8200, 0.0, 2.0);
+    int newVolume = map(sliderVal[sliderIndex], 0, 8200, 0, 32);
     scaper.changeSoundVolume(sliderIndex, newVolume);
     
     sliderIndex ++;
