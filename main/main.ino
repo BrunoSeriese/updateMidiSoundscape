@@ -1,13 +1,11 @@
 #include "./src/soundscaper.h"
 
-
-
 sc::SoundScaper scaper = sc::SoundScaper();
 const String soundPaths[7] = {
     "/s1.wav",
     "/s2.wav",
     "/s3.wav",
-    "/s2.wav",
+    "/s4.wav",
     "/s5.wav",
     "/s6.wav",
     "/s7.wav"
@@ -42,7 +40,8 @@ void initSlider(int sliders){
 
 int sliderIndex=0;
 void checkSliders(){
-    sliderVal[sliderIndex] = (sliderVal[sliderIndex]*1.9 + analogRead(slider[sliderIndex])*0.1)/2;
+    sliderVal[sliderIndex] = (sliderVal[sliderIndex]*1.9
+     + analogRead(slider[sliderIndex])*0.1)/2;
     int newVolume = map(sliderVal[sliderIndex], 0, 8200, 0, 32);
     scaper.changeSoundVolume(sliderIndex, newVolume);
     
