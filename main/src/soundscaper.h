@@ -9,8 +9,9 @@
 
 #define debug true
 #define maxSounds 7
+#define maxFileStrams 7
 int currentSounds = 0;
-const int bufferLen = 512;
+const int bufferLen = 256;
 
 const i2s_port_t I2S_PORT = I2S_NUM_0;
 #define BLCK_PIN 42
@@ -30,7 +31,7 @@ void initSD() {
     pinMode(14,OUTPUT);
     digitalWrite(14,HIGH);
     SPI.begin(SCK,MISO,MOSI,CS);
-    if (!SD.begin(CS, SPI, 4000000U, "/sd", 8, false)) {
+    if (!SD.begin(CS, SPI, 8000000U, "/sd", maxFileStrams, false)) {
         Serial.println("Card Mount Failed");
         return;
     }
@@ -84,7 +85,7 @@ class Sound {
         String name;
         File source;
         int16_t buffer[bufferLen];
-        float volume = 1;
+        int volume = 32;
         
         Sound() {
             initBuffer();
@@ -96,6 +97,9 @@ class Sound {
                 Serial.println("File not found: "+name);
             }
             initSource();
+        }
+        ~Sound() {
+            source.close();
         }
 
         void update() {
@@ -183,7 +187,7 @@ class SoundScaper {
             }
         }
 
-        void changeSoundVolume(int index, float volume) {
+        void changeSoundVolume(int index, int volume) {
 
         if (sounds[index]){
             sounds[index]->volume = volume;
@@ -220,13 +224,18 @@ class SoundScaper {
             for (int i = 0; i < bufferLen; i++) {
                 for (int j = 0; j < currentSounds; j++)
                 {
-                    sample = sounds[j]->buffer[i];      // read sample
-                    sample = sample/currentSounds;          // normalise sample
-                    sample = round(sample*sounds[j]->volume);  // scale sample
-                    if (sample < minValue) sample = minValue; // clam sample
-                    if (sample > maxValue) sample = maxValue;
-                    buffer[i] += sample;
+                    sample += sounds[j]->buffer[i]*sounds[j]->volume;      // read sample
                 }
+                
+                sample /=256;
+
+                if (sample < minValue) {
+                    Serial.println("clipping1");
+                    sample = minValue;}
+                if (sample > maxValue) {
+                    Serial.println("clipping2");
+                    sample = maxValue;}
+                buffer[i] = sample;
             }
 
             // write to i2s buffer
@@ -243,7 +252,7 @@ class SoundScaper {
         int createIndex = 0;
         int16_t buffer[bufferLen];
         const int bufferSize = sizeof(buffer);
-        int16_t sample = 0;
+        int32_t sample = 0;
 };
 
     
